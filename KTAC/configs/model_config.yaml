@@ -1,0 +1,48 @@
+# =============================================================================
+# KTAC Configuration
+# Edit paths and hyperparameters to match your environment before running.
+# =============================================================================
+
+run_name: "KTAC_UBC_OCEAN"
+seed: 42
+device: "cuda"
+num_workers: 2
+
+# --- Paths ---
+paths:
+  feat_dirs:
+    - "data/pt"                        # Directory containing .pt feature files
+  splits_dir: "data/splits"            # Root directory containing fold split CSVs
+  prompts_dir: "data/prompts"          # Directory containing text prompt CSV files
+
+# --- Experiments ---
+# Each experiment specifies a dataset, its label CSV, prompt file, and shot settings.
+experiments_to_run:
+  - dataset_name: "UBC_OCEAN"
+    manifest_file: "data/dataset.csv"                              # Label CSV with slide_id and label columns
+    prompts_file: "data/prompts/UBC-OCEAN_text_prompt.csv"        # Text prompts (one per class)
+    num_classes: 5
+    settings:
+      - "4shot"
+      - "8shot"
+      - "16shot"
+
+# --- Model ---
+model:
+  image_feature_dim: 512       # Feature dimension from CONCH extractor
+  projection_dim: 256          # Internal projection dimension
+  compression_ratio: 0.8       # Gamma: fraction of tokens kept after language-guided selection
+  text_encoder_name: "distilbert-base-uncased"
+  max_text_length: 256
+  aggregator:
+    num_heads: 8
+    dropout: 0.5
+
+# --- Training ---
+training:
+  epochs: 60
+  batch_size: 16
+  learning_rate: 1.0e-4
+  weight_decay: 0.005
+  label_smoothing: 0.1
+  early_stopping_patience: 15
